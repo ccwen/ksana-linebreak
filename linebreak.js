@@ -13,16 +13,23 @@ var indexOfSorted = function (array, obj, near) {
 };
 
 var Linebreak=function(data,opts) {
+
+	var rebuildtext=function() {
+		if (!obj.dirty) return;
+		obj.text=obj.arr.join("");
+		obj.length=obj.text.length;
+		obj.dirty=false;
+	}
 	var builddata=function(data) {
 		obj.arr=data.split(/\r?\n/);
-		obj.text=obj.arr.join("");
 		obj.lengths=[],len=0;
 		for (var i=0;i<obj.arr.length;i++) {
 			obj.lengths.push(len);
 			len+=obj.arr[i].length;
 		}
 		obj.lengths.push(len);
-		obj.length=len;
+		obj.dirty=true;
+		rebuildtext();
 	}
 
 	var lineoff2pos=function(lineoff) {
@@ -49,12 +56,27 @@ var Linebreak=function(data,opts) {
 		var line=lo[0],off=lo[1];
 		var text=obj.arr[line];
 
-		obj.arr[line]=text.substr(0,pos)+str+text.substr(pos);
+		obj.arr[line]=text.substr(0,off)+str+text.substr(off);
 		obj.lengths[lo[0]+1]+=str.length;
+		obj.dirty=true;
+	}
 
+	var remove=function(pos,len) {
+		var lo=pos2lineoff(pos);
+		if (!lo) return;
+		var line=lo[0],off=lo[1];
+		var text=obj.arr[line];
+
+		obj.arr[line]=text.substr(0,off)+text.substr(off+len);
+		var reducelength=text.length-obj.arr[line].length;
+
+		obj.lengths[lo[0]+1]-= reducelength;
+
+		obj.dirty=true;
 	}
 
 	var find=function(pat , start) {
+		rebuildtext();
 		if (typeof pat=="string") {
 			return obj.text.indexOf(pat,start);
 		} else {
@@ -74,11 +96,12 @@ var Linebreak=function(data,opts) {
 	}
 */
 	var obj={data:"",arr:[],length:0,lengths:[]
-		,insert:insert
 		//,replace:replace
 		,lineoff2pos:lineoff2pos
 		,pos2lineoff:pos2lineoff
 		,find:find
+		,insert:insert
+		,remove:remove
 	};
 
 	builddata(data);

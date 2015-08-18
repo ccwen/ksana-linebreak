@@ -30,11 +30,10 @@ describe("linebreak",function(){
 		assert.equal( lb.lineoff2pos([4,1]), -1 ); //exceed line
 	});
 
-	it("insert",function(){
+	it("insert text",function(){
 		var lb=new linebreak(data);
 		lb.insert(2,"QQ");
 		assert.deepEqual(lb.arr, ["01QQ~~45678~","~12345~~89","012~~5678~","~12345~~89"]);
-
 	});
 
 	it("find normal string",function(){
@@ -56,6 +55,16 @@ describe("linebreak",function(){
 		var idx=lb.find(/[45]/,6);
 		assert.equal(idx,14);
 	});	
+
+	it("remove text",function(){
+		var lb=new linebreak(data);
+		lb.remove(16,2);
+		assert.deepEqual(lb.arr, ["01~~45678~","~1234589","012~~5678~","~12345~~89"]);
+
+		lb.remove(2,2);
+		assert.deepEqual(lb.arr, ["0145678~","~1234589","012~~5678~","~12345~~89"]);
+	});
+
 /*
 	it("replace",function(){
 		var lb=new linebreak(data);
