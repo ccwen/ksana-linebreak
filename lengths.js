@@ -120,12 +120,10 @@ var Lengths=function() {
 	var remove=function(pos,sz){
 		var lo=pos2lineoff(pos);
 		if (!lo) return null;
+		var left=L[lo[0]]-lo[1];
+		if (sz>left) sz=left;
 
 		L[lo[0]]-=sz;
-		if (L[lo[0]]<0) {
-			sz+=L[lo[0]];
-			L[lo[0]]=0;
-		}
 
 		var acc=Math.floor(lo[0]/256);
 		for (var i=acc;i<ACC.length;i++) {

@@ -87,6 +87,10 @@ describe("lengths",function(){
 
 		newlength=lengths.remove(0,2);
 		assert.equal(newlength,2000-2); //nothing happen
+
+		newlength=lengths.remove(3,2);
+		assert.equal(newlength,2000-3); //nothing happen
+
 	});
 
 });
