@@ -30,20 +30,11 @@
      for 1 million lines, each update will cause maximum 4096 updates.
   
 */
-var indexOfSorted = function (array, obj, near) { 
-  var low = 0, high = array.length;
-  while (low < high) {
-    var mid = (low + high) >> 1;
-    if (array[mid]==obj) return mid;
-    array[mid] < obj ? low = mid + 1 : high = mid;
-  }
-  if (near) return low;
-  else if (array[low]==obj) return low;else return -1;
-};
 
 var Lengths=function() {
-	var L=[]  //item length
-	, ACC=[]; //accumulated length
+	var L=[]     //item length
+	, ACC=[]     //accumulated length
+  , length=0;  //total length
 
 	var add=function(n){
 		L.push(n);
@@ -53,28 +44,39 @@ var Lengths=function() {
 		ACC=[];
 		for (var i=0;i<L.length;i++) {
 			if (i%256==0 && i) {
-				ACC.push(accumulated);
+				ACC.push(accumulated); 
 			}
 			accumulated+=L[i];
 		}
 		ACC.push(accumulated);
+		length=accumulated;
 	}
+
+  var accofpos=function(pos) {
+		for (var i=0;i<ACC.length;i++) {
+			if (ACC[i]>pos) {
+				return i;
+			}
+		}
+		return -1;
+  }
+
 	var pos2lineoff=function(pos) {
-		var idx=indexOfSorted(ACC,pos,true);
+		var idx=accofpos(pos);
+		if (idx<0) return null;
 		var startfrom=0;
 		if (idx>0)  {
 			startfrom=ACC[idx-1];
 		}
+
 		var dist=pos-startfrom;
 		var line=idx*256;
+
 		while (dist>0) {
-			line++;
-			dist-=L[line];
-			if (dist<0) {
-				dist+=L[line];
-				line--;
-				break;
-			}
+			if (dist>=L[line]) {
+				dist-=L[line];
+				line++;	
+			} else break;
 		}
 		if (line>=L.length)return null;
 		return [line,dist];
@@ -92,15 +94,58 @@ var Lengths=function() {
 			pos+=L[line++];
 			remain--;
 		}
-		pos+=lo[1];
+		var off=lo[1];
+		if (off>=L[line]) off=L[line]-1;
+		pos+=off;
 		if (pos>=ACC[ACC.length-1]) return -1;
 		return pos;
 	}
+
+
+	var insert=function(pos,sz){
+		var lo=pos2lineoff(pos);
+		if (!lo) return null;
+
+		L[lo[0]]+=sz;
+
+		var acc=Math.floor(lo[0]/256);
+		for (var i=acc;i<ACC.length;i++) {
+			ACC[i]+=sz;
+		}
+
+		length+=sz;
+		return length;
+	}
+
+	var remove=function(pos,sz){
+		var lo=pos2lineoff(pos);
+		if (!lo) return null;
+
+		L[lo[0]]-=sz;
+		if (L[lo[0]]<0) {
+			sz+=L[lo[0]];
+			L[lo[0]]=0;
+		}
+
+		var acc=Math.floor(lo[0]/256);
+		for (var i=acc;i<ACC.length;i++) {
+			ACC[i]-=sz;
+		}
+
+		length-=sz;
+		return length;
+	}
+
+
 	this._ACC=function(){return ACC};
 	this.add=add;
 	this.build=build;
 	this.pos2lineoff=pos2lineoff;
 	this.lineoff2pos=lineoff2pos;
+	this.get=function(idx){return L[idx]};
+	this.getLength=function(){return length}
+	this.insert=insert;
+	this.remove=remove;
 	return this;
 }
 module.exports=Lengths;
