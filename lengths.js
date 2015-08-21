@@ -142,6 +142,7 @@ var Lengths=function() {
 	this.lineoff2pos=lineoff2pos;
 	this.get=function(idx){return L[idx]};
 	this.getLength=function(){return length}
+	this.count=function(){return L.length};
 	this.insert=insert;
 	this.remove=remove;
 	return this;
