@@ -63,7 +63,33 @@ describe("linebreak",function(){
 		var lb=new Linebreak(data);
 		var idx=lb.find(/[45]/,6);
 		assert.equal(idx,14);
-	});	
+	});
+
+	it("replace same width",function(){
+		var lb=new Linebreak(data);
+		var text=lb.replace(/~~/g,function(m){
+			return "##";
+		});
+		assert.deepEqual(lb.getArray(), ["01##45678#","#12345##89","012##5678#","#12345##89"]);
+	});
+
+	it("replace less width",function(){
+		var lb=new Linebreak(data);
+		var text=lb.replace(/~~/g,function(m){
+			return "";
+		});
+		//console.log(lb.getArray());
+		assert.deepEqual(lb.getArray(), ["0145678","1234589","0125678","1234589"]);
+	});
+	it("replace more width",function(){
+		var lb=new Linebreak(data);
+		var text=lb.replace(/~~/g,function(m){
+			return "@@@";
+		});
+		//console.log(lb.getArray());
+		assert.deepEqual(lb.getArray(), ["01@@@45678@","@@12345@@@89","012@@@5678@","@@12345@@@89"]);
+	});
+
 
 /*
 	it("replace",function(){
