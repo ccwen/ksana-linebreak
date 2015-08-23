@@ -90,14 +90,28 @@ describe("linebreak",function(){
 		assert.deepEqual(lb.getArray(), ["01@@@45678@","@@12345@@@89","012@@@5678@","@@12345@@@89"]);
 	});
 
-
-/*
-	it("replace",function(){
-		var lb=new Linebreak(data);
-		lb.replace(/~~/g,"");
-		assert.equal(lb.length,28);
-
-		assert.deepEqual(lb.arr,["0145678","1234589","0125678","1234589"]);
+	it("replace multiple line",function(){
+		var lb=new Linebreak("ab1\n11\n11\n1f");
+		var text=lb.replace(/1+/g,function(m){
+			return "";
+		});
+		assert.deepEqual(lb.getArray(), ["ab","","","f"]);
 	});
-*/
+
+	it("replace multiple line 2",function(){
+		var lb=new Linebreak("ab1\n11\n11\n1f");
+		var text=lb.replace(/1+/g,function(m){
+			return "qq";
+		});
+		assert.deepEqual(lb.getArray(), ["abq","q","","f"]);
+	});
+
+	it("replace multiple line 3",function(){
+		var lb=new Linebreak("ab1\n11\n11\n1f");
+		var text=lb.replace(/1+/g,function(m){
+			return "xxxxxxx";
+		});
+		assert.deepEqual(lb.getArray(), ["abx","xx","xx","xxf"]);
+	});
+
 });

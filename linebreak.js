@@ -72,21 +72,19 @@ var Linebreak=function(data,opts) {
 			}
 		} else {
 			if (from.length>to.length) {//reduce length
+				//console.log(obj.lengths.getL());
 				var remain=from.length-to.length;
-				for (var i=end[0];i>=start[0];i--) {
+				var startdelete=pos2lineoff(pos+to.length);
+
+				for (var i=end[0];i>=startdelete[0];i--) {
 					var len=obj.lengths.get(i);
-					if (remain<0) throw "error remain byte"
-					if (remain===0) break;
-					if (i===start[0]) {
-						obj.lengths.remove(pos,remain);
-					} else if (i===end[0]) {
-						var toremove=end[1];
-						remain-=toremove;
-						if (toremove) obj.lengths.remove(pos,toremove);
+					if (i===end[0]) {
+						remain-=obj.lengths.removeLine(i,end[1]);
 					} else {
-						obj.lengths.remove(len);
+						remain-=obj.lengths.removeLine(i,remain);
 					}
 				}
+				//console.log(obj.lengths.getL());
 			} else if (from.length<to.length) { //increase length
 				obj.lengths.insert(pos+from.length, to.length-from.length);
 			}

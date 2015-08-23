@@ -120,20 +120,28 @@ var Lengths=function() {
 	var remove=function(pos,sz){
 		var lo=pos2lineoff(pos);
 		if (!lo) return null;
+
 		var left=L[lo[0]]-lo[1];
 		if (sz>left) sz=left;
 
-		L[lo[0]]-=sz;
+		return removeLine(lo[0],sz);
+	}
 
-		var acc=Math.floor(lo[0]/256);
+	var removeLine=function(line,sz) {
+		var len=L[line];
+		if (sz>len) sz=len;
+
+		L[line]-=sz;
+		if (L[line]<0) L[line]=0;
+
+		var acc=Math.floor(line/256);
 		for (var i=acc;i<ACC.length;i++) {
 			ACC[i]-=sz;
 		}
 
 		length-=sz;
-		return length;
+		return sz;
 	}
-
 
 	this._ACC=function(){return ACC};
 	this.add=add;
@@ -141,10 +149,12 @@ var Lengths=function() {
 	this.pos2lineoff=pos2lineoff;
 	this.lineoff2pos=lineoff2pos;
 	this.get=function(idx){return L[idx]};
+	this.getL=function(){return L};
 	this.getLength=function(){return length}
 	this.count=function(){return L.length};
 	this.insert=insert;
 	this.remove=remove;
+	this.removeLine=removeLine;
 	return this;
 }
 module.exports=Lengths;
